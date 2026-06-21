@@ -6,7 +6,120 @@ import time
 import os
 import re
 import subprocess
+import sys
+import random
 from urllib.parse import urlparse, unquote
+from colorama import init, Fore, Back, Style
+
+init(autoreset=True)
+
+class Colors:
+    RED = Fore.RED
+    GREEN = Fore.GREEN
+    YELLOW = Fore.YELLOW
+    BLUE = Fore.CYAN
+    PURPLE = Fore.MAGENTA
+    WHITE = Fore.WHITE
+    BOLD = Style.BRIGHT
+    RESET = Style.RESET_ALL
+
+def clear_screen():
+    os.system('clear' if os.name != 'nt' else 'cls')
+
+def print_slow(text, color=Colors.WHITE, delay=0.03):
+    for char in text:
+        sys.stdout.write(f"{color}{char}{Colors.RESET}")
+        sys.stdout.flush()
+        time.sleep(delay)
+    print()
+
+def print_ascii_art():
+    clear_screen()
+    colors = [Colors.RED, Colors.GREEN, Colors.YELLOW, Colors.BLUE, Colors.PURPLE]
+
+    art = r"""
+    ╔══════════════════════════════════════════════════════════════╗
+    ║                                                              ║
+    ║     __        _______ ____  ___    ____ _____ _   _ ______   ║
+    ║     \ \      / / ____/ ___||__ \  / ___|_   _| | | |  _ \  ║
+    ║      \ \ /\ / /|  _| \___ \ / / | |     | | | | | | | | | ║
+    ║       \ V  V / | |___ ___) / /_ | |___  | | | |_| | |_| | ║
+    ║        \_/\_/  |_____|____/____| \____| |_|  \___/|____/  ║
+    ║                                                              ║
+    ║            + VIDEO DOWNLOADER + AUTO DETECT                  ║
+    ║                                                              ║
+    ╚══════════════════════════════════════════════════════════════╝
+    """
+    for line in art.split('\n'):
+        color = random.choice(colors)
+        print(f"{color}{Colors.BOLD}{line}{Colors.RESET}")
+        time.sleep(0.05)
+
+def loading_animation(text, duration=2):
+    frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+    colors = [Colors.RED, Colors.GREEN, Colors.YELLOW, Colors.BLUE, Colors.PURPLE]
+    end_time = time.time() + duration
+    i = 0
+    while time.time() < end_time:
+        sys.stdout.write(f"\r{random.choice(colors)}{frames[i % len(frames)]} {text}{Colors.RESET}   ")
+        sys.stdout.flush()
+        time.sleep(0.1)
+        i += 1
+    print(f"\r{Colors.GREEN}✓ {text} Done!{Colors.RESET}   ")
+
+def progress_bar(current, total, prefix="Progress", suffix="Complete", length=40):
+    filled = int(length * current / total)
+    bar = "█" * filled + "░" * (length - filled)
+    percent = current / total * 100
+    color = Colors.GREEN if percent == 100 else Colors.YELLOW
+    sys.stdout.write(f"\r{Colors.BLUE}{prefix}: {color}{bar} {percent:.1f}% {suffix}{Colors.RESET}")
+    sys.stdout.flush()
+
+def print_banner():
+    colors = [Colors.RED, Colors.GREEN, Colors.YELLOW, Colors.BLUE, Colors.PURPLE, Colors.WHITE]
+    banner = f"""
+{Colors.BOLD}{Colors.BLUE}    ╔══════════════════════════════════════════════════════╗
+    ║                                                      ║
+    ║     🔍 SEARCH    📥 DOWNLOAD    🎬 VIDEOS            ║
+    ║                                                      ║
+    ║     Instagram | TikTok | YouTube | Twitter           ║
+    ║                                                      ║
+    ╚══════════════════════════════════════════════════════╝{Colors.RESET}"""
+    print(banner)
+
+def print_menu():
+    print(f"""
+{Colors.BOLD}{Colors.CYAN}    ┌─────────────────────────────────────────┐
+    │           {Colors.YELLOW}📋 MAIN MENU{Colors.CYAN}                      │
+    ├─────────────────────────────────────────┤
+    │                                         │
+    │   {Colors.GREEN}1.{Colors.WHITE}  🔍 Web Search{Colors.CYAN}                   │
+    │   {Colors.GREEN}2.{Colors.WHITE}  🔎 Website Keyword Search{Colors.CYAN}       │
+    │   {Colors.GREEN}3.{Colors.WHITE}  🔗 Website Link Search{Colors.CYAN}          │
+    │                                         │
+    │   {Colors.GREEN}4.{Colors.WHITE}  📝 Text Scrape{Colors.CYAN}                  │
+    │   {Colors.GREEN}5.{Colors.WHITE}  🔗 Links Scrape{Colors.CYAN}                 │
+    │   {Colors.GREEN}6.{Colors.WHITE}  🖼️  Images Scrape{Colors.CYAN}                │
+    │                                         │
+    │   {Colors.GREEN}7.{Colors.WHITE}  🎬 Video Download{Colors.CYAN}               │
+    │   {Colors.GREEN}8.{Colors.WHITE}  📥 File Download{Colors.CYAN}                │
+    │   {Colors.GREEN}9.{Colors.WHITE}  🖼️  Download All Images{Colors.CYAN}            │
+    │                                         │
+    │   {Colors.RED}10.{Colors.WHITE} 🚪 Exit{Colors.CYAN}                          │
+    │                                         │
+    └─────────────────────────────────────────┘{Colors.RESET}""")
+
+def print_success(text):
+    print(f"\n{Colors.GREEN}{Colors.BOLD}  ✅ {text}{Colors.RESET}")
+
+def print_error(text):
+    print(f"\n{Colors.RED}{Colors.BOLD}  ❌ {text}{Colors.RESET}")
+
+def print_info(text):
+    print(f"\n{Colors.BLUE}{Colors.BOLD}  ℹ️  {text}{Colors.RESET}")
+
+def print_warning(text):
+    print(f"\n{Colors.YELLOW}{Colors.BOLD}  ⚠️  {text}{Colors.RESET}")
 
 class WebScraper:
     def __init__(self):
@@ -56,10 +169,12 @@ class WebScraper:
         return None
 
     def download_video(self, url, quality="best"):
-        print(f"\n{'='*55}")
-        print(f"VIDEO: {url}")
-        print(f"Quality: {quality}")
-        print(f"{'='*55}")
+        print(f"\n{Colors.BOLD}{Colors.CYAN}{'='*55}")
+        print(f"  🎬 VIDEO DOWNLOAD")
+        print(f"{'='*55}{Colors.RESET}")
+        print(f"{Colors.WHITE}  URL: {Colors.YELLOW}{url}{Colors.RESET}")
+        print(f"{Colors.WHITE}  Quality: {Colors.GREEN}{quality}{Colors.RESET}")
+        print(f"{Colors.CYAN}{'='*55}{Colors.RESET}")
 
         output_template = os.path.join(self.download_dir, "%(title).70s.%(ext)s")
 
@@ -71,38 +186,20 @@ class WebScraper:
         ]
 
         if quality == "720":
-            formats_to_try = [
-                "bestvideo[height<=720]+bestaudio/best[height<=720]",
-                "best[height<=720]",
-                "best",
-            ]
+            formats_to_try = ["bestvideo[height<=720]+bestaudio/best[height<=720]", "best[height<=720]", "best"]
         elif quality == "480":
-            formats_to_try = [
-                "bestvideo[height<=480]+bestaudio/best[height<=480]",
-                "best[height<=480]",
-                "best",
-            ]
+            formats_to_try = ["bestvideo[height<=480]+bestaudio/best[height<=480]", "best[height<=480]", "best"]
         elif quality == "360":
-            formats_to_try = [
-                "bestvideo[height<=360]+bestaudio/best[height<=360]",
-                "best[height<=360]",
-                "best",
-            ]
+            formats_to_try = ["bestvideo[height<=360]+bestaudio/best[height<=360]", "best[height<=360]", "best"]
 
         for fmt in formats_to_try:
             cmd = [
-                "yt-dlp",
-                "-f", fmt,
-                "--no-check-certificates",
-                "--no-warnings",
-                "-o", output_template,
-                "--no-overwrites",
-                "--print", "after_move:filepath",
-                url
+                "yt-dlp", "-f", fmt, "--no-check-certificates", "--no-warnings",
+                "-o", output_template, "--no-overwrites", "--print", "after_move:filepath", url
             ]
 
             try:
-                print(f"Trying: {fmt[:50]}...")
+                loading_animation(f"Trying format: {fmt[:40]}", 1)
                 result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
 
                 if result.returncode == 0:
@@ -110,7 +207,7 @@ class WebScraper:
                     if filepath and os.path.exists(filepath):
                         size = os.path.getsize(filepath)
                         sz = f"{size/(1024*1024):.1f} MB" if size > 1024*1024 else f"{size/1024:.1f} KB"
-                        print(f"Downloaded: {filepath} ({sz})")
+                        print_success(f"Downloaded: {filepath} ({sz})")
                         return filepath
                     else:
                         files = sorted(os.listdir(self.download_dir),
@@ -119,31 +216,33 @@ class WebScraper:
                             latest = os.path.join(self.download_dir, files[0])
                             if os.path.getmtime(latest) > time.time() - 60:
                                 size = os.path.getsize(latest)
-                                print(f"Found: {latest} ({size/(1024*1024):.1f} MB)")
+                                print_success(f"Found: {latest} ({size/(1024*1024):.1f} MB)")
                                 return latest
                 else:
                     err = result.stderr[:200] if result.stderr else ""
                     if "format" in err.lower():
-                        print(f"  Format not available, trying next...")
+                        print_warning(f"Format not available, trying next...")
                         continue
                     else:
-                        print(f"  Error: {err[:100]}")
+                        print_error(f"Error: {err[:100]}")
                         continue
 
             except subprocess.TimeoutExpired:
-                print("  Timeout, trying next...")
+                print_warning("Timeout, trying next...")
                 continue
             except FileNotFoundError:
+                print_info("Installing yt-dlp...")
                 subprocess.run(["pip", "install", "yt-dlp"], capture_output=True)
                 return self.download_video(url, quality)
             except Exception as e:
-                print(f"  Error: {e}")
+                print_error(f"Error: {e}")
                 continue
 
         return self._direct_video_download(url)
 
     def _direct_video_download(self, url):
         try:
+            loading_animation("Trying direct download", 1.5)
             html = self.fetch_text(url)
             if not html: return None
 
@@ -160,7 +259,7 @@ class WebScraper:
                         if any(x in m for x in ['googlevideo','fbcdn','cdninstagram','twimg','v.redd.it']):
                             best = m
                             break
-                    print(f"Direct link mila!")
+                    print_success("Direct link found!")
                     return self.download_file(best)
         except: pass
         return None
@@ -168,20 +267,30 @@ class WebScraper:
     def download_file(self, url, filename=None):
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
-        print(f"\nDownloading: {url[:80]}...")
+        print(f"\n{Colors.BLUE}📥 Downloading: {Colors.YELLOW}{url[:80]}...{Colors.RESET}")
         try:
             resp = self.session.get(url, stream=True, timeout=30)
             resp.raise_for_status()
         except Exception as e:
-            print(f"Failed: {e}")
+            print_error(f"Failed: {e}")
             return None
 
         content_type = resp.headers.get('Content-Type', '')
         chunks = []
+        total = int(resp.headers.get('content-length', 0))
+        downloaded = 0
+
         for chunk in resp.iter_content(chunk_size=65536):
-            if chunk: chunks.append(chunk)
+            if chunk:
+                chunks.append(chunk)
+                downloaded += len(chunk)
+                if total:
+                    progress_bar(downloaded, total)
+
         data = b''.join(chunks)
-        if not data: print("Empty!"); return None
+        if not data:
+            print_error("Empty response!")
+            return None
 
         ext = self.auto_detect(url, data, resp.headers)
         if not filename:
@@ -196,7 +305,7 @@ class WebScraper:
         if size > 1024*1024: sz = f"{size/(1024*1024):.1f} MB"
         elif size > 1024: sz = f"{size/1024:.1f} KB"
         else: sz = f"{size} B"
-        print(f"Saved: {filepath} ({sz})")
+        print_success(f"Saved: {filepath} ({sz})")
         return filepath
 
     def _make_filename(self, url, content_disp, ext):
@@ -221,13 +330,14 @@ class WebScraper:
             resp.raise_for_status()
             return resp.text
         except Exception as e:
-            print(f"Error: {e}")
+            print_error(f"Error: {e}")
             return None
 
     def parse(self, html):
         return BeautifulSoup(html, 'html.parser')
 
     def web_search(self, query, num=10):
+        loading_animation("Searching DuckDuckGo", 1.5)
         url = f"https://html.duckduckgo.com/html/?q={requests.utils.quote(query)}"
         try:
             resp = self.session.get(url, timeout=10)
@@ -255,6 +365,7 @@ class WebScraper:
         return [{'src': img.get('src', ''), 'alt': img.get('alt', '')} for img in soup.select(sel)]
 
     def search_links(self, url, keyword):
+        loading_animation("Searching website", 1)
         html = self.fetch_text(url)
         if not html: return []
         soup = self.parse(html)
@@ -270,135 +381,150 @@ class WebScraper:
         return results
 
     def download_all_images(self, url, selector='img'):
+        loading_animation("Fetching page", 1)
         html = self.fetch_text(url)
         if not html: return []
         soup = self.parse(html)
         images = self.extract_images(soup, selector)
         downloaded = []
-        for img in images:
+        for i, img in enumerate(images, 1):
             src = img['src']
             if not src.startswith(('http://', 'https://')):
                 src = url.rstrip('/') + '/' + src.lstrip('/')
+            print(f"\n{Colors.BLUE}[{i}/{len(images)}]{Colors.RESET} Downloading image...")
             result = self.download_file(src)
             if result: downloaded.append(result)
-        print(f"\n{len(downloaded)} images downloaded!")
+        print_success(f"{len(downloaded)} images downloaded!")
         return downloaded
 
 
 def main():
     s = WebScraper()
 
-    print("=" * 55)
-    print("   WEB SCRAPER + VIDEO DOWNLOAD TOOL")
-    print("   Instagram | TikTok | YouTube | Twitter | Facebook")
-    print("=" * 55)
+    print_ascii_art()
+    time.sleep(0.5)
+    print_banner()
 
     while True:
-        print("\n--- SEARCH ---")
-        print("1. Web search")
-        print("2. Website pe keyword")
-        print("3. Website pe links")
-        print("\n--- SCRAPE ---")
-        print("4. Text scrape")
-        print("5. Links scrape")
-        print("6. Images scrape")
-        print("\n--- DOWNLOAD ---")
-        print("7. Video download (quality choose karo)")
-        print("8. File download (auto-detect)")
-        print("9. Saari images download")
-        print("\n--- OTHER ---")
-        print("10. Exit")
-
-        choice = input("\nSelect (1-10): ").strip()
+        print_menu()
+        choice = input(f"\n{Colors.YELLOW}    Select (1-10): {Colors.RESET}").strip()
 
         if choice == '10':
-            print("Bye!")
+            print(f"\n{Colors.BOLD}{Colors.CYAN}    ╔══════════════════════════════════╗")
+            print(f"    ║        👋 Goodbye!               ║")
+            print(f"    ║    See you next time!            ║")
+            print(f"    ╚══════════════════════════════════╝{Colors.RESET}\n")
             break
 
         if choice == '1':
-            query = input("\nSearch: ").strip()
+            print(f"\n{Colors.BOLD}{Colors.GREEN}    🔍 WEB SEARCH{Colors.RESET}")
+            query = input(f"    {Colors.WHITE}Search: {Colors.RESET}").strip()
             if not query: continue
             results = s.web_search(query)
             if not results:
-                print("Kuch nahi mila!"); continue
+                print_error("Kuch nahi mila!")
+                continue
+            print(f"\n{Colors.BOLD}{Colors.CYAN}    {'='*50}")
+            print(f"    📋 {len(results)} Results: \"{query}\"")
+            print(f"    {'='*50}{Colors.RESET}")
             for i, r in enumerate(results, 1):
-                print(f"\n{i}. {r['title']}")
-                print(f"   {r['url']}")
-                if r['description']: print(f"   {r['description'][:150]}")
-            dl = input("\nVideo download? (number/no): ").strip()
+                if 'title' not in r: continue
+                print(f"\n    {Colors.GREEN}{Colors.BOLD}{i}.{Colors.RESET} {Colors.WHITE}{r['title']}{Colors.RESET}")
+                print(f"       {Colors.BLUE}{r['url']}{Colors.RESET}")
+                if r['description']:
+                    print(f"       {Colors.YELLOW}{r['description'][:150]}{Colors.RESET}")
+
+            dl = input(f"\n    {Colors.YELLOW}Video download? (number/no): {Colors.RESET}").strip()
             if dl.isdigit() and 1 <= int(dl) <= len(results):
                 s.download_video(results[int(dl)-1].get('url',''))
 
         elif choice == '2':
-            url = input("URL: ").strip()
+            print(f"\n{Colors.BOLD}{Colors.GREEN}    🔎 WEBSITE KEYWORD SEARCH{Colors.RESET}")
+            url = input(f"    {Colors.WHITE}URL: {Colors.RESET}").strip()
             if not url.startswith(('http://', 'https://')): url = 'https://' + url
-            kw = input("Keyword: ").strip()
+            kw = input(f"    {Colors.WHITE}Keyword: {Colors.RESET}").strip()
             if not kw: continue
             results = s.search_links(url, kw)
             if not results:
-                print("Kuch nahi mila!"); continue
-            print(f"\n{len(results)} links:")
+                print_error("Kuch nahi mila!")
+                continue
+            print(f"\n{Colors.BOLD}{Colors.CYAN}    📋 {len(results)} Links Found:{Colors.RESET}")
             for i, r in enumerate(results, 1):
-                print(f"{i}. {r['text'][:60]} -> {r['url'][:100]}")
-            dl = input("\nDownload? (number/no): ").strip()
+                print(f"    {Colors.GREEN}{i}.{Colors.RESET} {r['text'][:60]} -> {Colors.BLUE}{r['url'][:100]}{Colors.RESET}")
+            dl = input(f"\n    {Colors.YELLOW}Download? (number/no): {Colors.RESET}").strip()
             if dl.isdigit() and 1 <= int(dl) <= len(results):
                 s.download_video(results[int(dl)-1]['url'])
 
         elif choice == '3':
-            url = input("URL: ").strip()
+            print(f"\n{Colors.BOLD}{Colors.GREEN}    🔗 WEBSITE LINK SEARCH{Colors.RESET}")
+            url = input(f"    {Colors.WHITE}URL: {Colors.RESET}").strip()
             if not url.startswith(('http://', 'https://')): url = 'https://' + url
-            kw = input("Keyword: ").strip()
+            kw = input(f"    {Colors.WHITE}Keyword: {Colors.RESET}").strip()
             if not kw: continue
             for i, r in enumerate(s.search_links(url, kw), 1):
-                print(f"{i}. {r['text'][:60]} -> {r['url'][:100]}")
+                print(f"    {Colors.GREEN}{i}.{Colors.RESET} {r['text'][:60]} -> {Colors.BLUE}{r['url'][:100]}{Colors.RESET}")
 
         elif choice in ['4','5','6']:
-            url = input("URL: ").strip()
+            url = input(f"    {Colors.WHITE}URL: {Colors.RESET}").strip()
             if not url.startswith(('http://', 'https://')): url = 'https://' + url
+            loading_animation("Fetching page", 1.5)
             html = s.fetch_text(url)
-            if not html: print("Failed!"); continue
+            if not html:
+                print_error("Failed!")
+                continue
             soup = s.parse(html)
-            print("Page loaded!")
+            print_success("Page loaded!")
+
             if choice == '4':
-                sel = input("CSS selector: ").strip()
-                for i, t in enumerate(s.extract_text(soup, sel)[:15], 1): print(f"{i}. {t[:120]}")
+                sel = input(f"    {Colors.WHITE}CSS selector: {Colors.RESET}").strip()
+                data = s.extract_text(soup, sel)
+                print(f"\n{Colors.BOLD}{Colors.CYAN}    📋 {len(data)} Elements:{Colors.RESET}")
+                for i, t in enumerate(data[:15], 1):
+                    print(f"    {Colors.GREEN}{i}.{Colors.RESET} {t[:120]}")
             elif choice == '5':
-                sel = input("CSS selector: ").strip()
-                for i, l in enumerate(s.extract_links(soup, sel)[:15], 1): print(f"{i}. {l['text'][:60]} -> {l['url'][:100]}")
+                sel = input(f"    {Colors.WHITE}CSS selector: {Colors.RESET}").strip()
+                data = s.extract_links(soup, sel)
+                print(f"\n{Colors.BOLD}{Colors.CYAN}    📋 {len(data)} Links:{Colors.RESET}")
+                for i, l in enumerate(data[:15], 1):
+                    print(f"    {Colors.GREEN}{i}.{Colors.RESET} {l['text'][:60]} -> {Colors.BLUE}{l['url'][:100]}{Colors.RESET}")
             elif choice == '6':
-                sel = input("Selector (default: img): ").strip() or 'img'
+                sel = input(f"    {Colors.WHITE}Selector (default: img): {Colors.RESET}").strip() or 'img'
                 data = s.extract_images(soup, sel)
-                for i, img in enumerate(data[:15], 1): print(f"{i}. {img['alt'][:40]} -> {img['src'][:100]}")
-                if input("\nDownload all? (y/n): ").strip().lower() == 'y':
+                print(f"\n{Colors.BOLD}{Colors.CYAN}    🖼️  {len(data)} Images:{Colors.RESET}")
+                for i, img in enumerate(data[:15], 1):
+                    print(f"    {Colors.GREEN}{i}.{Colors.RESET} {img['alt'][:40]} -> {Colors.BLUE}{img['src'][:100]}{Colors.RESET}")
+                if input(f"\n    {Colors.YELLOW}Download all? (y/n): {Colors.RESET}").strip().lower() == 'y':
                     s.download_all_images(url, sel)
 
         elif choice == '7':
-            print("\n--- VIDEO DOWNLOAD ---")
-            print("Instagram | TikTok | YouTube Shorts/Long")
-            print("Twitter/X | Facebook | Reddit | Any site")
-            print("-" * 45)
-            url = input("\nPaste video link: ").strip()
+            print(f"\n{Colors.BOLD}{Colors.GREEN}    🎬 VIDEO DOWNLOAD{Colors.RESET}")
+            print(f"    {Colors.CYAN}Instagram | TikTok | YouTube | Twitter | Facebook{Colors.RESET}")
+            print(f"    {Colors.CYAN}{'-'*50}{Colors.RESET}")
+            url = input(f"    {Colors.WHITE}Paste video link: {Colors.RESET}").strip()
             if not url: continue
 
-            print("\nQuality choose karo:")
-            print("1. Best (original quality)")
-            print("2. 720p (HD)")
-            print("3. 480p (SD)")
-            print("4. 360p (Low)")
-            q = input("Select (1-4, default=1): ").strip()
+            print(f"\n    {Colors.YELLOW}Quality choose karo:{Colors.RESET}")
+            print(f"    {Colors.GREEN}1.{Colors.WHITE} Best (original quality)")
+            print(f"    {Colors.GREEN}2.{Colors.WHITE} 720p (HD)")
+            print(f"    {Colors.GREEN}3.{Colors.WHITE} 480p (SD)")
+            print(f"    {Colors.GREEN}4.{Colors.WHITE} 360p (Low)")
+            q = input(f"    {Colors.YELLOW}Select (1-4, default=1): {Colors.RESET}").strip()
 
             quality_map = {'1': 'best', '2': '720', '3': '480', '4': '360'}
             quality = quality_map.get(q, 'best')
             s.download_video(url, quality)
 
         elif choice == '8':
-            url = input("URL: ").strip()
+            print(f"\n{Colors.BOLD}{Colors.GREEN}    📥 FILE DOWNLOAD{Colors.RESET}")
+            url = input(f"    {Colors.WHITE}URL: {Colors.RESET}").strip()
             s.download_file(url)
 
         elif choice == '9':
-            url = input("URL: ").strip()
+            print(f"\n{Colors.BOLD}{Colors.GREEN}    🖼️  DOWNLOAD ALL IMAGES{Colors.RESET}")
+            url = input(f"    {Colors.WHITE}URL: {Colors.RESET}").strip()
             if not url.startswith(('http://', 'https://')): url = 'https://' + url
             s.download_all_images(url)
+
 
 if __name__ == "__main__":
     main()
