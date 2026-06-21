@@ -1,129 +1,272 @@
-# Web Scraper + Video Download Tool
+# 🔥 Web Scraper + Video Download Tool
 
-Python tool for web scraping and video downloading from multiple platforms.
+```
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║     __        _______ ____  ___    ____ _____ _   _ ______   ║
+║     \ \      / / ____/ ___||__ \  / ___|_   _| | | |  _ \  ║
+║      \ \ /\ / /|  _| \___ \ / / | |     | | | | | | | | | ║
+║       \ V  V / | |___ ___) / /_ | |___  | | | |_| | |_| | ║
+║        \_/\_/  |_____|____/____| \____| |_|  \___/|____/  ║
+║                                                              ║
+║            + VIDEO DOWNLOADER + AUTO DETECT                  ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+```
 
-## Features
+![Python](https://img.shields.io/badge/Python-3.7+-blue?style=for-the-badge&logo=python&logoColor=white)
+![yt-dlp](https://img.shields.io/badge/yt-dlp-red?style=for-the-badge&logo=youtube&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Termux%20%7C%20Linux-green?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
-### Search
-- Web search via DuckDuckGo
-- Search keywords on any website
-- Search links on any website
+---
 
-### Scrape
-- Text extraction (CSS selectors)
-- Links extraction
-- Images extraction
-- Table data extraction
+## 📸 Features Preview
 
-### Download
-- Video download with quality selection (Best/720p/480p/360p)
-- File download with auto-detection
-- Batch image download
+```
+┌─────────────────────────────────────────────────┐
+│           📋 MAIN MENU                          │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│   1.  🔍 Web Search                             │
+│   2.  🔎 Website Keyword Search                 │
+│   3.  🔗 Website Link Search                    │
+│                                                 │
+│   4.  📝 Text Scrape                            │
+│   5.  🔗 Links Scrape                           │
+│   6.  🖼️  Images Scrape                         │
+│                                                 │
+│   7.  🎬 Video Download                         │
+│   8.  📥 File Download                          │
+│   9.  🖼️  Download All Images                   │
+│                                                 │
+│   10. 🚪 Exit                                   │
+│                                                 │
+└─────────────────────────────────────────────────┘
+```
 
-## Supported Platforms
+---
 
-| Platform | Video Download |
-|----------|----------------|
-| Instagram Reels | ✅ |
-| TikTok | ✅ |
-| YouTube Shorts | ✅ |
-| YouTube Videos | ✅ |
-| Twitter/X Videos | ✅ |
-| Facebook Videos | ✅ |
-| Reddit Videos | ✅ |
-| Any Website | ✅ |
+## 🎯 Supported Platforms
 
-## Supported File Formats (Auto-Detect)
+| Platform | Video | Reels | Shorts | Status |
+|----------|:-----:|:-----:|:------:|:------:|
+| 📸 Instagram | ✅ | ✅ | - | 🟢 Working |
+| 🎵 TikTok | ✅ | ✅ | - | 🟢 Working |
+| ▶️ YouTube | ✅ | - | ✅ | 🟢 Working |
+| 🐦 Twitter/X | ✅ | - | - | 🟢 Working |
+| 👤 Facebook | ✅ | - | - | 🟢 Working |
+| 🔴 Reddit | ✅ | - | - | 🟢 Working |
+| 🌐 Any Site | ✅ | - | - | 🟢 Working |
 
-Images: JPG, PNG, GIF, WebP, SVG, BMP
-Videos: MP4, WebM, MKV, AVI, MOV
-Audio: MP3, WAV, OGG, FLAC, M4A
-Documents: PDF, DOC, DOCX, XLS, XLSX
-Archives: ZIP, RAR, 7Z, TAR, GZ
-Other: APK, EXE, TXT, CSV, JSON, XML, HTML
+---
 
-## Installation
+## 📁 Supported File Formats
 
-### 1. Install Python packages
+```
+┌──────────────────────────────────────────────────────┐
+│  🖼️  IMAGES          │  🎬 VIDEOS        │  🎵 AUDIO │
+│  ├─ JPG              │  ├─ MP4           │  ├─ MP3   │
+│  ├─ PNG              │  ├─ WebM          │  ├─ WAV   │
+│  ├─ GIF              │  ├─ MKV           │  ├─ OGG   │
+│  ├─ WebP             │  ├─ AVI           │  ├─ FLAC  │
+│  └─ SVG              │  └─ MOV           │  └─ M4A   │
+│                       │                   │           │
+│  📄 DOCUMENTS        │  📦 ARCHIVES      │  🔧 OTHER │
+│  ├─ PDF              │  ├─ ZIP           │  ├─ APK   │
+│  ├─ DOC/DOCX         │  ├─ RAR           │  ├─ EXE   │
+│  ├─ XLS/XLSX         │  ├─ 7Z            │  ├─ TXT   │
+│  └─ PPT              │  └─ TAR/GZ        │  └─ JSON  │
+└──────────────────────────────────────────────────────┘
+```
+
+---
+
+## ⚡ Quick Start
+
+### 1️⃣ Clone Repository
+```bash
+git clone https://github.com/aim914/web-scraper-tool.git
+cd web-scraper-tool
+```
+
+### 2️⃣ Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Install yt-dlp
-```bash
-pip install yt-dlp
-```
-
-### 3. (Optional) Install ffmpeg for video processing
-```bash
-# Termux
-pkg install ffmpeg
-
-# Ubuntu/Debian
-sudo apt install ffmpeg
-
-# macOS
-brew install ffmpeg
-```
-
-## Usage
-
+### 3️⃣ Run Tool
 ```bash
 python web_scraper.py
 ```
 
-### Menu Options
-1. Web search - Search anything on DuckDuckGo
-2. Website pe keyword - Find specific content on a website
-3. Website pe links - Find links on a website
-4. Text scrape - Extract text using CSS selectors
-5. Links scrape - Extract all links from a page
-6. Images scrape - Extract all images from a page
-7. Video download - Download videos with quality selection
-8. File download - Download any file with auto-detection
-9. Images download - Download all images from a page
+---
 
-## Examples
+## 🎬 Video Download Examples
 
 ### Download Instagram Reel
 ```
-Select (7): Video download
-Paste link: https://www.instagram.com/reel/ABC123/
-Quality: 1 (Best)
+┌─────────────────────────────────────────────────┐
+│  🎬 VIDEO DOWNLOAD                              │
+│  ─────────────────────────────────────────────  │
+│  Instagram | TikTok | YouTube | Twitter         │
+│                                                 │
+│  Paste video link: https://instagram.com/reel/..│
+│                                                 │
+│  Quality choose karo:                           │
+│  1. Best (original quality)                     │
+│  2. 720p (HD)                                   │
+│  3. 480p (SD)                                   │
+│  4. 360p (Low)                                  │
+│                                                 │
+│  Select (1-4): 2                                │
+│                                                 │
+│  ✓ Downloaded: video.mp4 (5.2 MB)               │
+└─────────────────────────────────────────────────┘
 ```
 
-### Download YouTube Short
+### Web Search
 ```
-Select (7): Video download
-Paste link: https://youtube.com/shorts/ABC123
-Quality: 2 (720p)
+┌─────────────────────────────────────────────────┐
+│  🔍 WEB SEARCH                                  │
+│  ─────────────────────────────────────────────  │
+│  Search: python tutorial                         │
+│                                                 │
+│  📋 10 Results: "python tutorial"               │
+│                                                 │
+│  1. Python Tutorial for Beginners               │
+│     https://example.com/python                   │
+│     Learn Python from scratch...                │
+│                                                 │
+│  2. Advanced Python Programming                 │
+│     https://example.com/advanced                 │
+│     Master Python concepts...                   │
+└─────────────────────────────────────────────────┘
 ```
 
-### Scrape Website Text
-```
-Select (4): Text scrape
-URL: https://example.com
-CSS selector: h1, p, .class-name
+---
+
+## 🛠️ Installation Guide
+
+### Termux (Android)
+```bash
+pkg update && pkg upgrade
+pkg install python git ffmpeg
+pip install -r requirements.txt
 ```
 
-## Save Location
+### Ubuntu/Debian
+```bash
+sudo apt update
+sudo apt install python3 python3-pip ffmpeg
+pip3 install -r requirements.txt
+```
+
+### macOS
+```bash
+brew install python ffmpeg
+pip3 install -r requirements.txt
+```
+
+### Windows
+```powershell
+winget install Python.FFmpeg
+pip install -r requirements.txt
+```
+
+---
+
+## 📂 Save Location
 
 All downloads are saved to:
 ```
 /storage/emulated/0/only for work/downloads/
 ```
 
-## Requirements
+---
 
-- Python 3.7+
-- Internet connection
-- yt-dlp (for video downloads)
-- ffmpeg (optional, for video processing)
+## 🎨 Terminal Preview
 
-## License
+```
+    ╔══════════════════════════════════════════════════════╗
+    ║                                                      ║
+    ║     🔍 SEARCH    📥 DOWNLOAD    🎬 VIDEOS            ║
+    ║                                                      ║
+    ║     Instagram | TikTok | YouTube | Twitter           ║
+    ║                                                      ║
+    ╚══════════════════════════════════════════════════════╝
 
-MIT License
+    📋 MAIN MENU
+    ─────────────────────────────────────────
+    1.  🔍 Web Search
+    2.  🔎 Website Keyword Search
+    3.  🔗 Website Link Search
+    4.  📝 Text Scrape
+    5.  🔗 Links Scrape
+    6.  🖼️  Images Scrape
+    7.  🎬 Video Download
+    8.  📥 File Download
+    9.  🖼️  Download All Images
+    10. 🚪 Exit
 
-## Author
+    Select (1-10): 7
 
-aim914
+    🎬 VIDEO DOWNLOAD
+    ═══════════════════════════════════════════
+    URL: https://instagram.com/reel/ABC123/
+    Quality: best
+
+    ⠹ Trying format: best...
+    ✓ Downloaded: reel_ABC123.mp4 (3.5 MB)
+```
+
+---
+
+## 📋 Requirements
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| Python | 3.7+ | Runtime |
+| requests | 2.28+ | HTTP requests |
+| beautifulsoup4 | 4.12+ | HTML parsing |
+| yt-dlp | 2024+ | Video download |
+| colorama | 0.4+ | Terminal colors |
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👨‍💻 Author
+
+**aim914**
+
+![GitHub](https://img.shields.io/badge/GitHub-aim914-181717?style=for-the-badge&logo=github&logoColor=white)
+
+---
+
+## ⭐ Star History
+
+If this tool helped you, give it a ⭐ on GitHub!
+
+---
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║  Made with ❤️ by aim914                                      ║
+║  Instagram | TikTok | YouTube Video Downloader              ║
+╚══════════════════════════════════════════════════════════════╝
+```
