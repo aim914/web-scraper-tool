@@ -169,7 +169,18 @@ class WebScraper:
         if h[:4] == b'ftyp': return 'mp4'
         return None
 
+    def _clean_url(self, url):
+        url = url.strip().strip('"').strip("'")
+        if not url.startswith(('http://', 'https://')):
+            url = 'https://' + url
+        return url
+
+    def _get_cookie_file(self):
+        cookie_path = os.path.join(os.path.dirname(__file__), "cookies.txt")
+        return cookie_path if os.path.exists(cookie_path) else None
+
     def download_video(self, url, quality="best"):
+        url = self._clean_url(url)
         print(f"\n{Colors.BOLD}{Colors.CYAN}{'='*55}")
         print(f"  🎬 VIDEO DOWNLOAD")
         print(f"{'='*55}{Colors.RESET}")
@@ -177,15 +188,27 @@ class WebScraper:
         print(f"{Colors.WHITE}  Quality: {Colors.GREEN}{quality}{Colors.RESET}")
         print(f"{Colors.CYAN}{'='*55}{Colors.RESET}")
 
+        result = self._ytdlp_download(url, quality)
+        if result:
+            return result
+
+        print_info("Trying alternative methods...")
+        result = self._direct_video_download(url)
+        if result:
+            return result
+
+        result = self._web_fallback_download(url)
+        if result:
+            return result
+
+        print_error("Sorry, this URL is not supported. yt-dlp may need an update.")
+        print_info("Run: pip install -U yt-dlp")
+        return None
+
+    def _ytdlp_download(self, url, quality):
         output_template = os.path.join(self.download_dir, "%(title).70s.%(ext)s")
 
-        formats_to_try = [
-            "best",
-            "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
-            "bestvideo+bestaudio/best",
-            "worst",
-        ]
-
+        formats_to_try = ["best", "bestvideo+bestaudio/best", "worst"]
         if quality == "720":
             formats_to_try = ["bestvideo[height<=720]+bestaudio/best[height<=720]", "best[height<=720]", "best"]
         elif quality == "480":
@@ -193,12 +216,13 @@ class WebScraper:
         elif quality == "360":
             formats_to_try = ["bestvideo[height<=360]+bestaudio/best[height<=360]", "best[height<=360]", "best"]
 
-        for fmt in formats_to_try:
-            cmd = [
-                "yt-dlp", "-f", fmt, "--no-check-certificates", "--no-warnings",
-                "-o", output_template, "--no-overwrites", "--print", "after_move:filepath", url
-            ]
+        extra_args = ["--no-check-certificates", "--no-warnings", "-o", output_template, "--no-overwrites"]
+        cookie = self._get_cookie_file()
+        if cookie:
+            extra_args += ["--cookies", cookie]
 
+        for fmt in formats_to_try:
+            cmd = ["yt-dlp", "-f", fmt] + extra_args + ["--print", "after_move:filepath", url]
             try:
                 loading_animation(f"Trying format: {fmt[:40]}", 1)
                 result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
@@ -210,23 +234,24 @@ class WebScraper:
                         sz = f"{size/(1024*1024):.1f} MB" if size > 1024*1024 else f"{size/1024:.1f} KB"
                         print_success(f"Downloaded: {filepath} ({sz})")
                         return filepath
-                    else:
-                        files = sorted(os.listdir(self.download_dir),
-                                       key=lambda x: os.path.getmtime(os.path.join(self.download_dir, x)), reverse=True)
-                        if files:
-                            latest = os.path.join(self.download_dir, files[0])
-                            if os.path.getmtime(latest) > time.time() - 60:
-                                size = os.path.getsize(latest)
-                                print_success(f"Found: {latest} ({size/(1024*1024):.1f} MB)")
-                                return latest
+                    files = sorted(os.listdir(self.download_dir),
+                                   key=lambda x: os.path.getmtime(os.path.join(self.download_dir, x)), reverse=True)
+                    if files:
+                        latest = os.path.join(self.download_dir, files[0])
+                        if os.path.getmtime(latest) > time.time() - 60:
+                            size = os.path.getsize(latest)
+                            print_success(f"Found: {latest} ({size/(1024*1024):.1f} MB)")
+                            return latest
                 else:
-                    err = result.stderr[:200] if result.stderr else ""
+                    err = (result.stderr or "")[:300]
+                    if "unsupported url" in err.lower():
+                        print_error(f"Unsupported URL by yt-dlp")
+                        return None
                     if "format" in err.lower():
                         print_warning(f"Format not available, trying next...")
                         continue
-                    else:
-                        print_error(f"Error: {err[:100]}")
-                        continue
+                    print_error(f"yt-dlp error: {err[:150]}")
+                    continue
 
             except subprocess.TimeoutExpired:
                 print_warning("Timeout, trying next...")
@@ -234,35 +259,127 @@ class WebScraper:
             except FileNotFoundError:
                 print_info("Installing yt-dlp...")
                 subprocess.run(["pip", "install", "yt-dlp"], capture_output=True)
-                return self.download_video(url, quality)
+                return self._ytdlp_download(url, quality)
             except Exception as e:
-                print_error(f"Error: {e}")
+                print_error(f"yt-dlp failed: {e}")
                 continue
 
-        return self._direct_video_download(url)
+        return None
 
     def _direct_video_download(self, url):
         try:
             loading_animation("Trying direct download", 1.5)
             html = self.fetch_text(url)
-            if not html: return None
+            if not html:
+                return None
 
             patterns = [
-                r'(https?://[^\s"\'<>]+\.mp4[^\s"\'<>]*)',
-                r'"(https?://[^"]*\.mp4[^"]*)"',
-                r"'(https?://[^']*\.mp4[^']*)'",
+                r'https?://[^\s"\'<>]+\.(mp4|webm|mkv|avi|mov)[^\s"\'<>]*',
+                r'"(https?://[^"]*\.(mp4|webm|mkv)[^"]*)"',
+                r"'(https?://[^']*\.(mp4|webm|mkv)[^']*)'",
+                r'data-url\s*=\s*["\'](https?://[^"\']+)["\']',
+                r'data-video\s*=\s*["\'](https?://[^"\']+)["\']',
+                r'<video[^>]+src\s*=\s*["\']([^"\']+)["\']',
+                r'<source[^>]+src\s*=\s*["\']([^"\']+)["\']',
             ]
+
+            all_matches = []
             for pattern in patterns:
+                matches = re.findall(pattern, html, re.IGNORECASE)
+                for m in matches:
+                    m = m[0] if isinstance(m, tuple) else m
+                    if m.startswith(('http://', 'https://')):
+                        all_matches.append(m)
+
+            if all_matches:
+                priority_domains = ['googlevideo', 'fbcdn', 'cdninstagram', 'twimg',
+                                    'v.redd.it', 'tiktokcdn', 'video', 'media']
+                best = all_matches[0]
+                for m in all_matches:
+                    if any(d in m for d in priority_domains):
+                        best = m
+                        break
+                print_success("Direct video link found!")
+                return self.download_file(best)
+
+            json_patterns = [
+                r'"video_url"\s*:\s*"([^"]+)"',
+                r'"videoUrl"\s*:\s*"([^"]+)"',
+                r'"download_url"\s*:\s*"([^"]+)"',
+                r'"contentUrl"\s*:\s*"([^"]+)"',
+                r'"url"\s*:\s*"([^"]+\.(mp4|webm|mkv))"',
+            ]
+            for pattern in json_patterns:
                 matches = re.findall(pattern, html)
                 if matches:
-                    best = matches[0]
-                    for m in matches:
-                        if any(x in m for x in ['googlevideo','fbcdn','cdninstagram','twimg','v.redd.it']):
-                            best = m
-                            break
-                    print_success("Direct link found!")
-                    return self.download_file(best)
-        except: pass
+                    m = matches[0] if isinstance(matches[0], str) else matches[0][0]
+                    if m.startswith(('http://', 'https://')):
+                        print_success("Found video URL in page data!")
+                        final = m.replace('\\/', '/').replace('\\u0026', '&')
+                        return self.download_file(final)
+
+        except Exception as e:
+            print_error(f"Direct download failed: {e}")
+        return None
+
+    def _web_fallback_download(self, url):
+        platforms = {
+            'instagram.com': ['instagram', 'Instagram'],
+            'tiktok.com': ['tiktok', 'TikTok'],
+            'vm.tiktok.com': ['tiktok', 'TikTok'],
+            'facebook.com': ['facebook', 'Facebook'],
+            'fb.watch': ['facebook', 'Facebook'],
+            'twitter.com': ['twitter', 'Twitter'],
+            'x.com': ['twitter', 'Twitter'],
+            'youtube.com': ['youtube', 'YouTube'],
+            'youtu.be': ['youtube', 'YouTube'],
+            'pinterest.com': ['pinterest', 'Pinterest'],
+            'pin.it': ['pinterest', 'Pinterest'],
+            'reddit.com': ['reddit', 'Reddit'],
+            'redd.it': ['reddit', 'Reddit'],
+            'linkedin.com': ['linkedin', 'LinkedIn'],
+            'snapchat.com': ['snapchat', 'Snapchat'],
+            'likee.com': ['likee', 'Likee'],
+            'dailymotion.com': ['dailymotion', 'DailyMotion'],
+            'dai.ly': ['dailymotion', 'DailyMotion'],
+            'vimeo.com': ['vimeo', 'Vimeo'],
+            'twitch.tv': ['twitch', 'Twitch'],
+            'rumble.com': ['rumble', 'Rumble'],
+            't.co': ['twitter', 'Twitter'],
+        }
+
+        detected = None
+        for domain, info in platforms.items():
+            if domain in url.lower():
+                detected = info
+                break
+
+        if detected:
+            print_info(f"Detected platform: {detected[1]}")
+            loading_animation(f"Trying {detected[1]} fallback", 2)
+
+            cmd = [
+                "yt-dlp", "--no-check-certificates", "--no-warnings",
+                "--ignore-errors", "--force-ipv4",
+                "-f", "best", "-o", os.path.join(self.download_dir, "%(title).70s.%(ext)s"),
+                "--no-overwrites", "--print", "after_move:filepath", url
+            ]
+            try:
+                cookie = self._get_cookie_file()
+                if cookie:
+                    cmd.extend(["--cookies", cookie])
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+                if result.returncode == 0:
+                    filepath = result.stdout.strip().split('\n')[-1]
+                    if filepath and os.path.exists(filepath):
+                        print_success(f"Downloaded: {filepath}")
+                        return filepath
+                else:
+                    print_warning(f"Fallback failed: {(result.stderr or '')[:100]}")
+            except Exception as e:
+                print_warning(f"Fallback error: {e}")
+
+        print_info(f"No download method worked for this URL")
         return None
 
     def download_file(self, url, filename=None):
@@ -503,7 +620,9 @@ def main():
 
         elif choice == '7':
             print(f"\n{Colors.BOLD}{Colors.GREEN}    🎬 VIDEO DOWNLOAD{Colors.RESET}")
-            print(f"    {Colors.CYAN}Instagram | TikTok | YouTube | Twitter | Facebook{Colors.RESET}")
+            print(f"    {Colors.CYAN}Instagram | TikTok | YouTube | Twitter/X | Facebook{Colors.RESET}")
+            print(f"    {Colors.CYAN}Pinterest | Reddit | LinkedIn | Snapchat | Likee{Colors.RESET}")
+            print(f"    {Colors.CYAN}DailyMotion | Vimeo | Twitch | Rumble & more{Colors.RESET}")
             print(f"    {Colors.CYAN}{'-'*50}{Colors.RESET}")
             url = input(f"    {Colors.WHITE}Paste video link: {Colors.RESET}").strip()
             if not url: continue
