@@ -15,7 +15,7 @@
 ```
 
 ![Python](https://img.shields.io/badge/Python-3.7+-blue?style=for-the-badge&logo=python&logoColor=white)
-![yt-dlp](https://img.shields.io/badge/yt-dlp-red?style=for-the-badge&logo=youtube&logoColor=white)
+![API](https://img.shields.io/badge/Powered%20By-PrenivAPI-purple?style=for-the-badge)
 ![Platform](https://img.shields.io/badge/Platform-Termux%20%7C%20Linux-green?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
@@ -49,15 +49,23 @@
 
 ## 🎯 Supported Platforms
 
-| Platform | Video | Reels | Shorts | Status |
-|----------|:-----:|:-----:|:------:|:------:|
-| 📸 Instagram | ✅ | ✅ | - | 🟢 Working |
-| 🎵 TikTok | ✅ | ✅ | - | 🟢 Working |
-| ▶️ YouTube | ✅ | - | ✅ | 🟢 Working |
-| 🐦 Twitter/X | ✅ | - | - | 🟢 Working |
-| 👤 Facebook | ✅ | - | - | 🟢 Working |
-| 🔴 Reddit | ✅ | - | - | 🟢 Working |
-| 🌐 Any Site | ✅ | - | - | 🟢 Working |
+| Platform | Video | Audio | Status |
+|----------|:-----:|:-----:|:------:|
+| 📸 Instagram | ✅ | - | 🟢 Working |
+| 🎵 TikTok | ✅ | - | 🟢 Working |
+| ▶️ YouTube | ✅ | ✅ | 🟢 Working |
+| 🐦 Twitter/X | ✅ | - | 🟢 Working |
+| 👤 Facebook | ✅ | - | 🟢 Working |
+| 🧵 Threads | ✅ | - | 🟢 Working |
+| 📌 Pinterest | ✅ | - | 🟢 Working |
+| 🎵 Spotify | - | ✅ | 🟢 Working |
+| 🍎 Apple Music | - | ✅ | 🟢 Working |
+| ✂️ CapCut | ✅ | - | 🟢 Working |
+| 🌤️ Bluesky | ✅ | - | 🟢 Working |
+| 📕 RedNote | ✅ | - | 🟢 Working |
+| ⚡ Kuaishou | ✅ | - | 🟢 Working |
+| 📱 Weibo | ✅ | - | 🟢 Working |
+| 🎬 Douyin | ✅ | - | 🟢 Working |
 
 ---
 
@@ -151,26 +159,25 @@ python web_scraper.py
 ### Termux (Android)
 ```bash
 pkg update && pkg upgrade
-pkg install python git ffmpeg
+pkg install python git
 pip install -r requirements.txt
 ```
 
 ### Ubuntu/Debian
 ```bash
 sudo apt update
-sudo apt install python3 python3-pip ffmpeg
+sudo apt install python3 python3-pip
 pip3 install -r requirements.txt
 ```
 
 ### macOS
 ```bash
-brew install python ffmpeg
+brew install python
 pip3 install -r requirements.txt
 ```
 
 ### Windows
 ```powershell
-winget install Python.FFmpeg
 pip install -r requirements.txt
 ```
 
@@ -229,7 +236,6 @@ All downloads are saved to:
 | Python | 3.7+ | Runtime |
 | requests | 2.28+ | HTTP requests |
 | beautifulsoup4 | 4.12+ | HTML parsing |
-| yt-dlp | 2024+ | Video download |
 | colorama | 0.4+ | Terminal colors |
 
 ---
