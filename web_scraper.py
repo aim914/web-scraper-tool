@@ -17,7 +17,8 @@ class Colors:
     RED = Fore.RED
     GREEN = Fore.GREEN
     YELLOW = Fore.YELLOW
-    BLUE = Fore.CYAN
+    BLUE = Fore.BLUE
+    CYAN = Fore.CYAN
     PURPLE = Fore.MAGENTA
     WHITE = Fore.WHITE
     BOLD = Style.BRIGHT
